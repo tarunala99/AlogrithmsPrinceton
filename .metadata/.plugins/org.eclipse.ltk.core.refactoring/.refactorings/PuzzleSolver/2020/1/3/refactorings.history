@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Extract method &apos;private Board removeList(int highest)&apos; from &apos;Solver.Solver()&apos; to &apos;Solver&apos;&#x0D;&#x0A;- Original project: &apos;PuzzleSolver&apos;&#x0D;&#x0A;- Method name: &apos;removeList&apos;&#x0D;&#x0A;- Destination type: &apos;Solver&apos;&#x0D;&#x0A;- Declared visibility: &apos;private&apos;" comments="false" description="Extract method &apos;removeList&apos;" destination="0" exceptions="false" flags="786434" id="org.eclipse.jdt.ui.extract.method" input="/src&lt;{Solver.java" name="removeList" replace="false" selection="810 296" stamp="1579016714438" version="1.0" visibility="2"/>
+</session>

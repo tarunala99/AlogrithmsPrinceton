@@ -1,0 +1,50 @@
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.TrieST;
+
+public class BoggleSolver {
+	
+	TrieST<Integer> dictionaryTree;
+	Map<Integer,Integer> pointsMap;
+	// Initializes the data structure using the given array of strings as the dictionary.
+    // (You can assume each word in the dictionary contains only the uppercase letters A through Z.)
+    public BoggleSolver(String[] dictionary)
+    {
+    	pointsMap();
+    	for(String temp : dictionary)
+    	{
+    		int points=pointScore(temp);
+    		dictionaryTree.put(temp, points);
+    	}
+    }
+    
+    private int pointScore(String string)
+    {
+    	int length = string.length();
+		length = length>8?8:length;
+		int points = pointsMap.get(length);
+		return points;
+    }
+    
+    private void pointsMap()
+    {
+    	pointsMap = new HashMap<>();
+    	pointsMap.put(0,0);
+    	pointsMap.put(1,0);
+    	pointsMap.put(2,0);
+    	pointsMap.put(3,1);
+    	pointsMap.put(4,1);
+    	pointsMap.put(5,2);
+    	pointsMap.put(6,3);
+    	pointsMap.put(7,5);
+    	pointsMap.put(8,11);
+    }
+
+	
+    public static void main(String[] args) {
+        System.out.println("Hwllo world");
+    }
+
+}

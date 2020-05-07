@@ -1,0 +1,64 @@
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.princeton.cs.algs4.In;
+
+class Node {
+	Character value;
+	Node next;
+	
+	Node()
+	{
+		
+	}
+	
+	Node(Character i)
+	{
+		this.value=i;
+		this.next=newNode;
+	}
+}
+public class MoveToFront {
+	
+	MoveToFront()
+	{
+		Node[] charList = new Node[256];
+		Node root = new Node();
+		Node prev;
+		for(int i=0;i<256;i++)
+		{
+			charList[i]= new Node((char)i);
+			prev.next = charList[i];
+			prev = charList[i];
+		}
+		System.out.println(charList[99]);
+	}
+
+    // apply move-to-front encoding, reading from standard input and writing to standard output
+    public static void encode()
+    {
+    	In in = new In("abra.txt");
+    	int count = 0;
+    	while(in.hasNextChar())
+    	{
+    		Character temp =  in.readChar();
+    		map.put(temp,)
+    		count++;
+    	}
+    	
+    }
+
+    // apply move-to-front decoding, reading from standard input and writing to standard output
+    public static void decode()
+    {
+    	
+    }
+
+    // if args[0] is "-", apply move-to-front encoding
+    // if args[0] is "+", apply move-to-front decoding
+    public static void main(String[] args)
+    {
+    	new MoveToFront();
+    }
+
+}

@@ -1,0 +1,98 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import edu.princeton.cs.algs4.MinPQ;
+
+public class Solver {
+
+    // find a solution to the initial board (using the A* algorithm)
+	private MinPQ<Integer> queue = new MinPQ<Integer>();
+	private Map<Integer,List<Board>> map = new HashMap<Integer,List<Board>>();
+	private int moves = 0;
+    public Solver(Board initial)
+    {
+    	Board currentBoard = initial;
+    	if(initial.manhattan()==0)
+		{
+			return;
+		}
+    	queue.insert(currentBoard.manhattan());
+    	List<Board> value = new ArrayList<Board>();
+    	value.add(currentBoard);
+    	map.put(currentBoard.manhattan(), value);
+    	moves =1;
+    	while(!queue.isEmpty())
+    	{
+    		int highest = queue.min();
+    		currentBoard = removeList(highest);
+    		if(currentBoard.manhattan()==0)
+    		{
+    			return;
+    		}
+	    	Iterator<Board> test = currentBoard.neighbors().iterator();
+	    	while(test.hasNext())
+	    	{
+	    		Board tempBoard = test.next();
+	    		int manhattan = tempBoard.manhattan();
+	    		if(manhattan==0)
+	    		{
+	    			return;
+	    		}
+	    		int priority = manhattan+moves;
+	    		queue.insert(priority);
+	    		List<Board> tempList = map.containsKey(priority)? map.get(priority):new ArrayList<Board>();
+	    		tempList.add(tempBoard);
+	    		map.put(priority,tempList);
+	    	}
+    	}
+    }
+
+	private Board removeList(int highest) {
+		Board currentBoard;
+		List<Board> currentList = map.get(highest);
+		if(currentList.size()>1)
+		{
+			currentBoard = currentList.get(0);
+			currentList.remove(0);
+			map.put(highest, currentList);
+		}
+		else {
+			currentBoard = currentList.get(0);
+			queue.delMin();
+			map.remove(highest);
+		}
+		return currentBoard;
+	}
+
+    // is the initial board solvable? (see below)
+    public boolean isSolvable()
+    {
+    	return false;
+    }
+
+    // min number of moves to solve initial board
+    public int moves()
+    {
+    	return moves;
+    }
+
+    // sequence of boards in a shortest solution
+    public Iterable<Board> solution()
+    {
+    	return null;
+    }
+
+    // test client (see below) 
+    public static void main(String[] args)
+    {
+    	int[][] temp = {{0,1,3},{4,2,5},{7,8,6}};
+    	int[][] temp1 = {{0,1,3},{4,2,5},{7,8,6}};
+    	Board board = new Board(temp);
+    	Solver solver = new Solver(board);
+    	System.out.println(solver.moves());
+    }
+
+}

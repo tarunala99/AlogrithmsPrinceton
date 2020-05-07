@@ -1,0 +1,181 @@
+import edu.princeton.cs.algs4.Point2D;
+import edu.princeton.cs.algs4.RectHV;
+
+class Element {
+	Point2D data;
+	Element left = null;
+	Element right = null;
+	Element parent = null;
+	
+	Element(Point2D value)
+	{
+		data = value;
+	}
+}
+
+public class KdTree {
+   private Element root;
+   private int count;
+   public KdTree()                               // construct an empty set of points 
+   {
+	   
+   }
+   public boolean isEmpty()                      // is the set empty? 
+   {
+	   if(root==null)
+	   {
+		   return true;
+	   }
+	   return false;
+   }
+   public int size()                         // number of points in the set 
+   {
+	   return count;
+   }
+   
+   private boolean compareX(Point2D p,Point2D q)
+   {
+	   if(p.x()>q.x())
+		   return true;
+	   else
+		   return false;
+   }
+   private boolean compareY(Point2D p,Point2D q)
+   {
+	   if(p.y()>q.y())
+		   return true;
+	   else
+		   return false;
+   }
+   
+   public Element insert(Point2D p,Element current,int height)              // add the point to the set (if it is not already in the set)
+   {
+	   if(current==null)
+	   {
+		   current = new Element(p);
+		   if(height==0)
+		   {
+			   root = current;
+		   }
+		   return current;
+	   }
+	   compareValue(p, current, height);
+	   return null;
+	   
+   }
+private void compareValue(Point2D p, Element current, int height) {
+	Element response = null;
+	   if(height%2==0)
+	   {
+		   if(compareX(current.data,p))
+		   {
+			   response = insert(p,current.left,height+1);
+			   if(response!=null)
+			   {
+				   current.left = response;
+			   }
+		   }
+		   else
+		   {
+			   response = insert(p,current.right,height+1);
+			   if(response!=null)
+			   {
+				   current.right = response;
+			   }
+		   }
+	   }
+	   else {
+		   if(compareY(current.data,p))
+		   {
+			   response = insert(p,current.left,height+1);
+			   if(response!=null)
+			   {
+				   current.left = response;
+			   } 
+		   }
+		   else
+		   {
+			   response = insert(p,current.right,height+1);
+			   if(response!=null)
+			   {
+				   current.right = response;
+			   }
+		   }
+	   }
+}
+   public boolean contains(Point2D p)            // does the set contain point p? 
+   {
+	   Element temp = root;
+	   int height = 0;
+	   while(temp!=null)
+	   {
+		   if(temp.data.distanceTo(p)==0)
+			   return true;
+		   if(height%2==0)
+		   {
+			   if(compareX(temp.data,p))
+			   {
+				   temp=temp.left;
+			   }
+			   else
+			   {
+				   temp=temp.right;
+			   }
+		   }
+		   else {
+			   if(compareY(temp.data,p))
+			   {
+				   temp=temp.left;
+			   }
+			   else
+			   {
+				   temp=temp.right;
+			   }
+		   }
+		   height++;
+	   }
+	   return false;
+   }
+   
+   public void draw()                         // draw all points to standard draw 
+   {
+	   return;
+   }
+   public Iterable<Point2D> range(RectHV rect)             // all points that are inside the rectangle (or on the boundary) 
+   {
+	   return null;
+   }
+   public Point2D nearest(Point2D p)             // a nearest neighbor in the set to point p; null if the set is empty 
+   {
+	   return null;
+   }
+   
+   public String traversal(Element current)
+	{
+		if(current==null)
+			return null;
+		StringBuilder sb = new StringBuilder();
+		String temp = traversal(current.left);
+		if(temp!=null)
+			sb.append(temp);
+		sb.append(current.data.toString());
+		temp = traversal(current.right);
+		if(temp!=null)
+			sb.append(temp);
+		return sb.toString();
+	}
+   
+   public static void main(String[] args)  {                // unit testing of the methods (optional) 
+	   KdTree pointSET = new KdTree();
+	   RectHV rectHV = new RectHV(0,0,5,5);
+	   pointSET.insert(new Point2D(7,2), pointSET.root, 0);
+	   pointSET.insert(new Point2D(5,4), pointSET.root, 0);
+	   pointSET.insert(new Point2D(2,3), pointSET.root, 0);
+	   pointSET.insert(new Point2D(4,7), pointSET.root, 0);
+	   pointSET.insert(new Point2D(9,6), pointSET.root, 0);
+	   System.out.println(pointSET.traversal(pointSET.root));
+	   System.out.println(pointSET.root.data.toString());
+	   System.out.println(pointSET.contains(new Point2D(8,7)));
+	   System.out.println(pointSET.contains(new Point2D(4,7)));
+   }
+}

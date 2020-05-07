@@ -1,0 +1,74 @@
+import java.util.Arrays;
+import java.util.Comparator;
+
+class Node{
+	String string;
+	int index;
+	
+	Node(String string, int index)
+	{
+		this.string = string;
+		this.index = index;
+	}
+}
+
+public class CircularSuffixArray {
+
+	private int length = 0;
+	private Node[] resultList;
+	private String createRotation(int offset, String string)
+	{
+		StringBuilder sb = new StringBuilder();
+		Character start = string.charAt(0);
+		String sub = string.substring(1,string.length());
+		sb.append(sub);
+		sb.append(start);
+		return sb.toString();
+		
+	}
+	
+    private class StringComparator implements Comparator<Node> {
+        @Override
+        public int compare(Node string1, Node string2) {
+        	String temp1 = string1.string;
+        	String temp2 = string2.string;
+        	return temp1.compareTo(temp2);
+        }
+    }
+    // circular suffix array of s
+    public CircularSuffixArray(String s)
+    {
+    	length = s.length();
+    	resultList = new Node[length];
+    	resultList[0]=new Node(s,0);
+    	for(int i=0;i<length-1;i++)
+    	{
+    		s = createRotation(1,s);
+    		resultList[i+1]=new Node(s,i+1);
+    	}
+    	Arrays.sort(resultList,new StringComparator());
+    }
+
+    // length of s
+    public int length()
+    {
+    	return length;
+    }
+
+    // returns index of ith sorted suffix
+    public int index(int i)
+    {
+    	return 0;
+    }
+
+    // unit testing (required)
+    public static void main(String[] args)
+    {
+    	CircularSuffixArray circularSuffixArray = new CircularSuffixArray("ABRACADABRA!");
+    	for(Node string : circularSuffixArray.resultList)
+    	{
+    		System.out.println(string.index+" asasas " + string.string);
+    	}
+    }
+
+}

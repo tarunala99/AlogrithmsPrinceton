@@ -1,0 +1,62 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import edu.princeton.cs.algs4.BinaryStdIn;
+import edu.princeton.cs.algs4.BinaryStdOut;
+
+public class MoveToFront {
+
+	private List<Character> initList()
+	{
+		List<Character> charList = new LinkedList<Character>();
+		for(int i=0;i<256;i++)
+		{
+			charList.add((char) i);
+		}
+		return charList;
+	}
+
+    // apply move-to-front encoding, reading from standard input and writing to standard output
+    public static void encode()
+    {
+    	MoveToFront moveToFront = new MoveToFront();
+    	List<Character> charList = moveToFront.initList();
+    	In in = new In("");
+    	while(!BinaryStdIn.isEmpty())
+    	{
+    		Character temp =  BinaryStdIn.readChar();
+    		int index = charList.indexOf(temp);
+    		charList.remove(index);
+    		charList.add(0, temp);
+    		BinaryStdOut.write((char)index);
+    	}	
+    }
+
+    // apply move-to-front decoding, reading from standard input and writing to standard output
+    public static void decode()
+    {
+    	MoveToFront moveToFront = new MoveToFront();
+    	List<Character> charList = moveToFront.initList();
+    	StringBuilder sb = new StringBuilder();
+    	while(!BinaryStdIn.isEmpty())
+    	{
+    		Character temp =  BinaryStdIn.readChar();
+    		int index = (int) temp;
+    		charList.remove(index);
+    		charList.add(0, temp);
+    		sb.append(charList.get((char)index));
+    		BinaryStdOut.write(charList.get(index));
+    	}
+    	
+    }
+
+    // if args[0] is "-", apply move-to-front encoding
+    // if args[0] is "+", apply move-to-front decoding
+    public static void main(String[] args)
+    {
+    	MoveToFront.encode();
+    	MoveToFront.decode();
+    }
+
+}

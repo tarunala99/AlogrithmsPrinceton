@@ -1,0 +1,55 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class CircularSuffixArray {
+
+	private int length = 0;
+	private List<String> resultList;
+	private String createRotation(int offset, String string)
+	{
+		StringBuilder sb = new StringBuilder();
+		Character start = string.charAt(0);
+		String sub = string.substring(1,string.length());
+		sb.append(sub);
+		sb.append(start);
+		return sb.toString();
+		
+	}
+    // circular suffix array of s
+    public CircularSuffixArray(String s)
+    {
+    	resultList = new ArrayList<>();
+    	length = s.length();
+    	resultList.add(s);
+    	for(int i=0;i<length-1;i++)
+    	{
+    		s = createRotation(1,s);
+    		resultList.add(s);
+    	}
+    	Arrays.sort(temp,currentPoint.slopeOrder());
+    }
+
+    // length of s
+    public int length()
+    {
+    	return length;
+    }
+
+    // returns index of ith sorted suffix
+    public int index(int i)
+    {
+    	return 0;
+    }
+
+    // unit testing (required)
+    public static void main(String[] args)
+    {
+    	CircularSuffixArray circularSuffixArray = new CircularSuffixArray("ABRACADABRA!");
+    	for(String string : circularSuffixArray.resultList)
+    	{
+    		System.out.println(string);
+    	}
+    }
+
+}

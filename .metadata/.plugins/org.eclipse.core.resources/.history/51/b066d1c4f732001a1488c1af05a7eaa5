@@ -1,0 +1,138 @@
+import java.util.Iterator;
+
+class Node<Item>{
+	//The item here needs to be generic rather than using an object
+	Item data;
+	Node<Item> next;
+	//requires the doubly linked list to support removal of the last element
+	Node<Item> prev;
+}
+
+public class Deque<Item> implements Iterable<Item> {
+	
+	//Implementing using a linked list
+	
+    // construct an empty deque
+	
+	public int queueSize = 0;
+	public Node<Item> head = null;
+	public Node<Item> tail = null;
+	
+	public int maxSize = 0;
+	
+	//Empty constructor
+    public Deque()
+    {
+    	
+    }
+
+    // is the deque empty?
+    public boolean isEmpty()
+    {
+    	if(head==null)
+    		return true;
+    	return false;
+    }
+
+    // return the number of items on the deque
+    public int size()
+    {
+    	return queueSize;
+    }
+
+    // add the item to the front
+    //the tail is expanded when an element is added
+    public void addFirst(Item item)
+    {
+    	Node<Item> temp = new Node<Item>();
+    	temp.data = item;
+    	if(tail!=null) //case where the queue is just initialized
+    	{
+    		tail.next = temp;
+    		temp.prev = tail;
+    	}
+    	tail=temp;
+    	queueSize++;
+    	//if it is the first element then reassign the head to the tail
+    	if(head==null)
+    	{
+    		head = tail;
+    	}
+    }
+
+    // add the item to the back
+    public void addLast(Item item)
+    {
+    	Node<Item> temp = new Node<Item>();
+    	temp.data = item;
+    	temp.next = head;
+    	head=temp;
+    	
+    	if(tail==null)
+    	{
+    		head = tail;
+    	}
+    	queueSize++;
+    }
+
+    // remove and return the item from the front
+    //move the tail backward
+    public Item removeFirst()
+    {
+    	Item returnItem = (Item) tail.data;
+    	tail=tail.prev;
+    	tail.next=null;
+    	return returnItem;
+    }
+
+    // remove and return the item from the back
+    //move the head forward
+    public Item removeLast()
+    {
+    	Item temp = head.data;
+    	head = head.next;
+    	head.prev=null;
+    	return temp;
+    }
+    private class LinkedListIterator implements Iterator<Item>
+    {
+    	public boolean hasNext() {
+    		if(head==null)
+    			return false;
+    		else
+    			return true;
+    	}
+    	public void remove() {
+    		
+    	}
+    	public Item next() {
+    		Item temp =(Item) head.data;
+    		head=head.next;
+    		return temp;
+    	}
+    	
+    }
+    
+    // return an iterator over items in order from front to back
+    public Iterator<Item> iterator()
+    {
+    	return new LinkedListIterator();
+    }
+
+    // unit testing (required)
+    public static void main(String[] args)
+    {
+    	Deque<Integer> queue = new Deque<Integer>();
+    	queue.addFirst(1);
+    	queue.addFirst(2);
+    	queue.addFirst(3);
+    	queue.addFirst(4);
+    	queue.addLast(5);
+    	queue.addLast(6);
+    	for(Integer temp :queue )
+    	{
+    		System.out.println(temp);
+    	}
+    }
+
+}

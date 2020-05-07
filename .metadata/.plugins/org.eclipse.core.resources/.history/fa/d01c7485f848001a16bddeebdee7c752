@@ -1,0 +1,175 @@
+import java.util.Arrays;
+
+import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Queue;
+
+public class SAP {
+	
+	private final Digraph graph;
+	private final Digraph reverseGraph;
+	private int[] distance;
+	private int[] reverseDistance;
+	private boolean[] marked;
+	private boolean[] reverseMarked;
+	private int[] parent;
+	private int size;
+	private Queue<Integer> queue;
+	private Queue<Integer> reverseQueue;
+	
+
+   // constructor takes a digraph (not necessarily a DAG)
+   public SAP(Digraph G)
+   {
+	   graph = G;
+	   reverseGraph = G.reverse();
+	   size = graph.V();
+	   marked = new boolean[size];
+	   reverseMarked = new boolean[size];
+	   distance = new int[size];
+	   reverseDistance = new int[size];
+	   parent = new int[size];
+	   //setting the distance value to the maximum
+	   for(int i=0;i<size;i++)
+	   {
+		   distance[i]=Integer.MAX_VALUE;
+		   reverseDistance[i]=Integer.MAX_VALUE;
+	   }
+   }
+
+   // length of shortest ancestral path between v and w; -1 if no such path
+   public int length(int v, int w)
+   {
+	   //do a directed search on the undirected graph one of the sources
+	   //can only change to directed or undirected only once
+	   return 0;
+   }
+
+   // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
+   public int ancestor(int v, int w)
+   {
+	   //update the distance
+	   queue = new Queue<Integer>();
+	   reverseQueue = new Queue<Integer>();
+	   queue.enqueue(v);
+	   reverseQueue.enqueue(w);
+	   distance[v]=0;
+	   reverseDistance[w]=0;
+	   int solution=Integer.MIN_VALUE;
+	   while(!queue.isEmpty() || !reverseQueue.isEmpty())
+	   {
+		   if(!queue.isEmpty())
+			   solution = updateQueue();
+		   if(!reverseQueue.isEmpty())
+			   solution = updateReverseQueue();
+		   if(solution>=0)
+			   break;
+	   }
+	   return solution;
+   }
+   
+   private int updateQueue(boolean flag)
+   {
+	   int currentNode = 0;
+	   if(flag)
+		   currentNode = queue.dequeue();
+	   else
+		   currentNode = reverseQueue.dequeue();
+	   if(marked[currentNode]&&reverseMarked[currentNode])
+		   return currentNode;
+	   int currentDistance = distance[currentNode];
+	   if(flag)
+		   marked[currentNode] = true;
+	   else
+		   reverseMarked[currentNode] = true;
+	   for(Integer nextNode : graph.adj(currentNode)) {
+		   if(!marked[nextNode] && flag) {
+			   queue.enqueue(nextNode);
+		   }
+		   if(!reverseMarked[nextNode] && !flag) {
+			   reverseQueue.enqueue(nextNode);
+		   }
+		   if(flag && currentDistance+1<distance[nextNode])
+		   {
+			   distance[nextNode] = currentDistance+1;
+			   parent[nextNode]=currentNode;
+		   }
+		   if(!flag && currentDistance+1<reverseDistance[nextNode])
+		   {
+			   reverseDistance[nextNode] = currentDistance+1;
+			   parent[nextNode]=currentNode;
+		   }
+	   }
+	   return Integer.MIN_VALUE;
+   }
+   
+   private int updateReverseQueue()
+   {
+	   int currentNode = 0;
+	   currentNode = reverseQueue.dequeue();
+	   int currentDistance = reverseDistance[currentNode];
+	   reverseMarked[currentNode] = true;
+	   for(Integer nextNode : graph.adj(currentNode)) { 
+		   if(marked[nextNode])
+			   return currentNode;
+		   if(!reverseMarked[nextNode]) {
+			   reverseQueue.enqueue(nextNode);
+		   }
+		   if(currentDistance+1<reverseDistance[nextNode])
+		   {
+			   reverseDistance[nextNode] = currentDistance+1;
+			   parent[nextNode]=currentNode;
+		   }
+	   }
+	   return Integer.MIN_VALUE;
+   }
+   
+   private int updateQueue()
+   {
+	   int currentNode = 0;
+	   currentNode = queue.dequeue();
+	   
+	   int currentDistance = distance[currentNode];
+	   marked[currentNode] = true;
+	   for(Integer nextNode : graph.adj(currentNode)) { 
+		   if(reverseMarked[nextNode])
+			   return currentNode;
+		   if(!marked[nextNode]) {
+			   queue.enqueue(nextNode);
+		   }
+		   if(currentDistance+1<distance[nextNode])
+		   {
+			   distance[nextNode] = currentDistance+1;
+			   parent[nextNode]=currentNode;
+		   }
+	   }
+	   return Integer.MIN_VALUE;
+   }
+
+   // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
+   public int length(Iterable<Integer> v, Iterable<Integer> w)
+   {
+	   return 0;
+   }
+
+   // a common ancestor that participates in shortest ancestral path; -1 if no such path
+   public int ancestor(Iterable<Integer> v, Iterable<Integer> w)
+   {
+	   return 0;
+   }
+
+   // do unit testing of this class
+   public static void main(String[] args)
+   {
+	   	//In in = new In(args[0]);
+	   	In in = new In("digraph3.txt");
+	    Digraph G = new Digraph(in);
+	    G.reverse();
+	    System.out.println(G.toString());
+	    SAP sap = new SAP(G);
+	    System.out.println(sap.ancestor(3, 10));
+	    System.out.println(Arrays.toString(sap.parent));
+	    System.out.println(Arrays.toString(sap.marked));
+	    System.out.println(Arrays.toString(sap.reverseMarked));
+   }
+}
