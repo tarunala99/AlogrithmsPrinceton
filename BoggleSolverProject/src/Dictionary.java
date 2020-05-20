@@ -30,7 +30,7 @@ public class Dictionary {
 		for(int i=0;i<currentString.length();i++)
 		{
 			Character x = currentString.charAt(i);
-			int index = x-64;
+			int index = x-65;
 			Node newNode;
 			if(temp.nodeList[index]==null)
 			{
@@ -73,11 +73,11 @@ public class Dictionary {
 		for(int i=0;i<currentString.length();i++)
 		{
 			Character x = currentString.charAt(i);
-			int index = x-64;
+			int index = x-65;
 			//has to check the index; not the current value
 			Node newNode = temp.nodeList[index];
 			//breaks when an equals value is found
-			if(newNode!=null && newNode.charVal==x && newNode.value==1 && currentString.length()-1 == i)
+			if(newNode!=null && newNode.charVal==x && newNode.value>0 && currentString.length()-1 == i)
 			{
 				result.contains = "VALUES ARE EQUAL";
 				break;
@@ -103,11 +103,11 @@ public class Dictionary {
 	public static void main(String[] args)
 	{
 		Dictionary dictionary = new Dictionary();
-		dictionary.addString("SAMPLE");
-		dictionary.addString("SAMPLEABC");
-		Boolean value = dictionary.doesContain("SAMPLE");
+		dictionary.addString("AT",10);
+		dictionary.addString("ATOM",45);
+		Boolean value = dictionary.doesContain("AT");
 		System.out.println(value);
-		value = dictionary.equalsString("SAMPLE");
+		value = dictionary.equalsString("AT");
 		System.out.println(value);
 		
 	}

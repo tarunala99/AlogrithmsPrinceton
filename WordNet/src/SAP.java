@@ -1,4 +1,5 @@
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.princeton.cs.algs4.Digraph;
 import edu.princeton.cs.algs4.In;
@@ -7,16 +8,12 @@ import edu.princeton.cs.algs4.Queue;
 public class SAP {
 	
 	private final Digraph graph;
-	private int[] distance;
-	private int[] reverseDistance;
-	private boolean[] marked;
-	private boolean[] reverseMarked;
-	private int[] parent;
+	private int distance;
+	private int ancestor;
 	private int size;
 	private Queue<Integer> queue;
 	private Queue<Integer> reverseQueue;
-	private int solution;
-	private int shortestDistance;
+	private int maxDistance;
 	
 
    // constructor takes a digraph (not necessarily a DAG)
@@ -28,17 +25,6 @@ public class SAP {
 	   }
 	   graph = G;
 	   size = graph.V();
-	   marked = new boolean[size];
-	   reverseMarked = new boolean[size];
-	   distance = new int[size];
-	   reverseDistance = new int[size];
-	   parent = new int[size];
-	   //setting the distance value to the maximum
-	   for(int i=0;i<size;i++)
-	   {
-		   distance[i]=Integer.MAX_VALUE;
-		   reverseDistance[i]=Integer.MAX_VALUE;
-	   }
    }
 
    // length of shortest ancestral path between v and w; -1 if no such path
@@ -51,15 +37,9 @@ public class SAP {
 	   {
 		   throw new IllegalArgumentException();
 	   }
-		   
-	   if(v==w)
-	   {
-		   return 0;
-	   }
+	   maxDistance = Integer.MAX_VALUE;
 	   shortestPath(v,w);
-	   if(solution<0)
-		   return -1;
-	   return distance[solution]+reverseDistance[solution];
+	   return maxDistance;
    }
 
    // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
@@ -69,137 +49,202 @@ public class SAP {
 	   {
 		   throw new IllegalArgumentException();
 	   }
-	   return shortestPath(v,w);
+	   shortestPath(v,w);
+	   return ancestor;
    }
    
-   private int shortestPath(int v,int w)
+   private void shortestPath(int v,int w)
    {
-	   //update the distance
-	   //queue marked and distance can be local variables which are passed
+	   //use map to store the values visited and the distance as well
+	   Map<Integer,Integer> map1 = new HashMap<>();
+	   Map<Integer,Integer> map2 = new HashMap<>();
+	   //when they are both the same node
 	   if(v==w)
 	   {
-		   return v;
-		   
-	   }
+		   ancestor = v;
+		   maxDistance = 0;
+		   return;
+	   }	   
 	   queue = new Queue<Integer>();
 	   reverseQueue = new Queue<Integer>();
 	   queue.enqueue(v);
-	   marked[v]=true;
+	   map1.put(v, 0);
+	   map2.put(w, 0);
 	   reverseQueue.enqueue(w);
-	   distance[v]=0;
-	   reverseDistance[w]=0;
-	   reverseMarked[w]=true;
-	   solution=Integer.MIN_VALUE;
+	   int value1 = Integer.MIN_VALUE;
+	   int value2 = Integer.MIN_VALUE;
+	   
 	   while(!queue.isEmpty() || !reverseQueue.isEmpty())
-	   {
+	   {		   
 		   if(!queue.isEmpty())
-			   solution = updateQueue();
-		   if(solution>=0)
-			   break;
-		   if(!reverseQueue.isEmpty())
-			   solution = updateReverseQueue();
-		   if(solution>=0)
-			   break;
-	   }
-	   if(solution<0)
-		   return -1;
-	   return solution;
-   }
-   
-   //do it on both the directions to get a bidrectional search
-   //add both the sides to get the final length
-   private int updateReverseQueue()
-   {
-	   int currentNode = 0;
-	   currentNode = reverseQueue.dequeue();
-	   int currentDistance = reverseDistance[currentNode];
-	   for(Integer nextNode : graph.adj(currentNode)) { 
-		   if(currentDistance+1<reverseDistance[nextNode])
 		   {
-			   reverseDistance[nextNode] = currentDistance+1;
-			   parent[nextNode]=currentNode;
-		   }
-		   if(marked[nextNode])
-			   return nextNode;
-		   if(!reverseMarked[nextNode]) {
-			   reverseQueue.enqueue(nextNode);
-			   reverseMarked[nextNode] = true;
-		   }
-	   }
-	   return Integer.MIN_VALUE;
-   }
-   
-   private int updateQueue()
-   {
-	   int currentNode = 0;
-	   currentNode = queue.dequeue();
-	   int currentDistance = distance[currentNode];
-	   for(Integer nextNode : graph.adj(currentNode)) { 
-		   if(currentDistance+1<distance[nextNode])
-		   {
-			   distance[nextNode] = currentDistance+1;
-			   parent[nextNode]=currentNode;
-		   }
-		   if(reverseMarked[nextNode])
-			   return nextNode;
-		   if(!marked[nextNode]) {
-			   queue.enqueue(nextNode);
-			   marked[nextNode] = true;
+			   value1 = queue.dequeue();
+			   //found a solution
+			   if(map2.containsKey(value1))
+			   {
+			   //just set do not return for iterative values
+				   distance = map1.get(value1) + map2.get(value1);
+				   if(distance<maxDistance)
+				   {
+					   ancestor = value1;
+					   maxDistance = distance;
+				   }
+			   }
+			   updateQueue(queue,value1,map1);
 		   }
 		   
+		   if(!reverseQueue.isEmpty())
+		   {
+			   value2 = reverseQueue.dequeue();
+			   if(map1.containsKey(value2))
+			   {
+				   distance = map2.get(value2) + map1.get(value2);
+				   if(distance<maxDistance)
+				   {
+					   ancestor = value2;
+					   maxDistance = distance;
+				   }
+			   }
+			   updateQueue(reverseQueue,value2,map2);
+		   }
+		   //since acyclic same value cannot be reached again
 	   }
-	   return Integer.MIN_VALUE;
+	   if(maxDistance==Integer.MAX_VALUE)
+	   {
+
+		   ancestor = -1;
+		   maxDistance = -1;
+	   }
+	   return;
+   }
+   
+   private void updateQueue(Queue<Integer> queue,int value,Map<Integer,Integer> map)
+   {
+	   //would require the count as well
+	   Iterable<Integer> temp = graph.adj(value);
+	   int value1 = map.get(value);
+	   for(Integer tempVal : temp)
+	   {
+		   if(!map.containsKey(tempVal))
+		   {
+			   queue.enqueue(tempVal);
+			   map.put(tempVal, value1+1);
+		   }
+	   }
+   }
+   
+   private boolean validityCheck(Iterable<Integer> v, Iterable<Integer> w)
+   {
+	   if(v==null || w==null)
+	   {
+		   return false;
+	   }
+	   for(Object temp : v)
+	   {
+		   if(temp==null)
+			   return false;
+	   }
+	   for(Object temp : w)
+	   {
+		   if(temp==null)
+			   return false;
+	   }
+	   return true;
    }
 
    // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
    public int length(Iterable<Integer> v, Iterable<Integer> w)
    {
+	   if(!validityCheck(v,w))
+		   throw new IllegalArgumentException();
+	   maxDistance = Integer.MAX_VALUE;
 	   iterableBFS(v, w);
-	   return shortestDistance;
+	   return maxDistance;
    }
 
    // a common ancestor that participates in shortest ancestral path; -1 if no such path
    public int ancestor(Iterable<Integer> v, Iterable<Integer> w)
    {
-	   return iterableBFS(v, w);
+	   if(!validityCheck(v,w))
+		   throw new IllegalArgumentException();
+	   iterableBFS(v, w);
+	   return ancestor;
    }
 
-   private int iterableBFS(Iterable<Integer> v, Iterable<Integer> w)
+   private void iterableBFS(Iterable<Integer> v, Iterable<Integer> w)
    {
-	   shortestDistance = Integer.MAX_VALUE;
-	   int ancestor = 0;
-	   //might require more optimizations
-	   //currently at n^2
-	   for(Integer node1 : v)
+	 //use map to store the values visited and the distance as well
+	   Map<Integer,Integer> map1 = new HashMap<>();
+	   Map<Integer,Integer> map2 = new HashMap<>();  
+	   queue = new Queue<Integer>();
+	   reverseQueue = new Queue<Integer>();
+	   for(Integer temp : v)
 	   {
-		   for(Integer node2 : w)
-		   {
-			   if(node1==null || node2==null || node1<0 || node2<0||node1>=size||node2>=size)
-			   {
-				   throw new IllegalArgumentException();
-			   }
-			   int tempAncestor = ancestor(node1,node2);
-			   int tempDistance = length(node1,node2);
-			   if(tempDistance<shortestDistance && tempDistance>=0)
-			   {
-				   ancestor = tempAncestor;
-				   shortestDistance = tempDistance;
-			   }
-		   }
+		   queue.enqueue(temp);
+		   map1.put(temp, 0);
 	   }
-	   return ancestor;
+	   for(Integer temp : w)
+	   {	   
+		   map2.put(temp, 0);
+		   reverseQueue.enqueue(temp);
+	   }
+
+	   int value1 = Integer.MIN_VALUE;
+	   int value2 = Integer.MIN_VALUE;
+	   
+	   while(!queue.isEmpty() || !reverseQueue.isEmpty())
+	   {		   
+		   if(!queue.isEmpty())
+		   {
+			   value1 = queue.dequeue();
+			   //found a solution
+			   if(map2.containsKey(value1))
+			   {
+			   //just set do not return for iterative values
+				   distance = map1.get(value1) + map2.get(value1);
+				   if(distance<maxDistance)
+				   {
+					   ancestor = value1;
+					   maxDistance = distance;
+				   }
+			   }
+			   updateQueue(queue,value1,map1);
+		   }
+		   
+		   if(!reverseQueue.isEmpty())
+		   {
+			   value2 = reverseQueue.dequeue();
+			   if(map1.containsKey(value2))
+			   {
+				   distance = map2.get(value2) + map1.get(value2);
+				   if(distance<maxDistance)
+				   {
+					   ancestor = value2;
+					   maxDistance = distance;
+				   }
+			   }
+			   updateQueue(reverseQueue,value2,map2);
+		   }
+		   //since acyclic same value cannot be reached again
+	   }
+	   if(maxDistance==Integer.MAX_VALUE)
+	   {
+
+		   ancestor = -1;
+		   maxDistance = -1;
+	   }
+	   return;
    }
    // do unit testing of this class
    public static void main(String[] args)
    {
 	   	//In in = new In(args[0]);
-	   	In in = new In(args[0]);
+	   	In in = new In("digraph1.txt");
 	    Digraph G = new Digraph(in);
-	    G.reverse();
-	    System.out.println(G.toString());
 	    SAP sap = new SAP(G);
-	    System.out.println("The ancestor is" + sap.ancestor(0, 6));
-	    System.out.println(Arrays.toString(sap.parent));
-	    System.out.println("The length is"+sap.length(0, 6));
+	    int v = 3;
+	    int w = 3;
+	    System.out.println("The length is "+sap.length(v, w));
+	    System.out.println("The ancestor is "+sap.ancestor(v, w));
    }
 }

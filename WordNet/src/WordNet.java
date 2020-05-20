@@ -10,6 +10,7 @@ public class WordNet {
 	private Map<String,Integer> wordMap = new HashMap<String,Integer>();
 	private Digraph graph;
 	private int resultDistance;
+	private final SAP sap;
 
    // constructor takes the name of the two input files
    public WordNet(String synsets, String hypernyms)
@@ -35,6 +36,7 @@ public class WordNet {
 			   graph.addEdge(Integer.parseInt(tempList[0]),Integer.parseInt(tempList[i]));
 		   }
 	   }
+	   sap = new SAP(graph);
    }
 
    // returns all WordNet nouns
@@ -52,6 +54,7 @@ public class WordNet {
    // distance between nounA and nounB (defined below)
    public int distance(String nounA, String nounB)
    {
+	   getDist(nounA, nounB);
 	   return resultDistance;
    }
 
@@ -59,11 +62,7 @@ public class WordNet {
    // in a shortest ancestral path (defined below)
    public String sap(String nounA, String nounB)
    {
-	   SAP sap = new SAP(graph);
-	   int nodeA = wordMap.get(nounA);
-	   int nodeB = wordMap.get(nounB);
-	   int resultNode = sap.ancestor(nodeA, nodeB);
-	   resultDistance = sap.length(nodeA, nodeB);
+	   getDist(nounA, nounB);
 	   for(Entry<String,Integer> i :wordMap.entrySet())
 	   {
 		   if(i.getValue()==resultDistance)
@@ -72,9 +71,18 @@ public class WordNet {
 	   return null;
    }
 
+	private void getDist(String nounA, String nounB) {
+		   
+		   int nodeA = wordMap.get(nounA);
+		   int nodeB = wordMap.get(nounB);
+		   resultDistance = sap.length(nodeA, nodeB);
+	}
+
    // do unit testing of this class
    public static void main(String[] args)
    {
-	   
+	   WordNet wordNet = new WordNet("synsets.txt","hypernyms.txt");
+	   System.out.println(wordNet.sap("Maya","gentleness"));
+	   System.out.println(wordNet.distance("Maya","gentleness"));
    }
 }
